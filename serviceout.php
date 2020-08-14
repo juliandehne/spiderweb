@@ -41,16 +41,19 @@ if (!isset($_GET["anyway"])) {
     }
 }
 if ((count($Kriterien)!=0)||(!isset($_GET['anyway']))) {$REQUESTSPINNE=$REQUESTSPINNE."')";}
-
-$pdo = new PDO('mysql:host=localhost;dbname=test', 'root', '');
+$dsn = 'mysql:host='.$db_host.';dbname='.$db_databasename;
+$pdo = new PDO($dsn, $db_user, $db_password, array(PDO::MYSQL_ATTR_FOUND_ROWS => true));
+$pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
 $statement = $pdo->prepare($REQUESTSPINNE);
 $statement->execute();
-$row = $statement->rowCount();
+$REQUESTCOUNT = str_replace("*", "COUNT(*)", $REQUESTSPINNE);
+
 
 $REQUESTSPINNE = $REQUESTSPINNE." LIMIT " .$_GET['from'] .",1;";
 $queryObj = mysqli_query($conn, $REQUESTSPINNE);
 $next = 0;
 if ($result = mysqli_fetch_object($queryObj))
+    $thereAreSolutions=1;
     $next=1;
 while ($next) {
     $temp=$result;
@@ -60,10 +63,15 @@ while ($next) {
     }
     else $next=0;
 }
-if($row!==0) {
+if ($thereAreSolutions){
     echo ",";
 }
-echo "\n{";
-echo "\n".'"limit": '.'"'.$row.'"'."\n";
+
+$countQuery = mysqli_query($conn, $REQUESTCOUNT);
+$countObject = mysqli_fetch_object($countQuery);
+foreach($countObject as $row=>$value){
+    echo "\n".'{"limit": '.'"'.$countObject->$row.'"'."\n";
+}
+
 echo "}";
 echo "\n]";

@@ -1,4 +1,4 @@
-<?php
+<?php include_once 'language.php';
 /**
  * Created by PhpStorm.
  * User: fides-WHK
@@ -6,6 +6,9 @@
  * Time: 13:15
  */
 include 'dbconn.php';
+
+
+
 $conn->set_charset("utf8");
 if($_SERVER['REQUEST_METHOD'] =='POST') {
     $values=[];
@@ -36,6 +39,4 @@ function redirect($url, $statusCode = 303)
     header('Location: ' . $url, true, $statusCode);
     die();
 }
-if(preg_match('/eng/',$_SERVER['HTTP_REFERER']) !== 0){
-    redirect ("mesoeng.php?mikroid=".$id,303);}
-else redirect("mesoger.php?mikroid=".$id,303);
+redirect ("mesoquestion.php"."?mikroid=".$id."&lang=".$lang['this'],303);
